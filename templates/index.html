@@ -1,0 +1,27 @@
+{% extends 'basic.html' %}
+
+{% block titles %} Wiki Lite {% endblock %}
+
+{% block body %}
+<main class="container">
+    <div class="my-3 p-3 bg-body rounded shadow-sm">
+        <div class="row justify-content-center my-5">
+            <div class="col-6 text-center" id="load">
+                <img src="{{url_for('static', filename='images/Wikipedia-logo.png')}}">
+                <div class="header-text mt-4">
+                    Wikipedia
+                    <p class="text-muted">Short Summary</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div class="col-6 text-center" id=operation style="display:none">
+    <img src="{{url_for('static', filename='images/wikilogo.gif')}}">
+    <div class="header-text mt-4">
+        Loading
+    <p class="text-muted">Please wait...</p>
+    </div>
+</div>
+{% endblock %}

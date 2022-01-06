@@ -1,0 +1,11 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+  {% if messages %}
+    {% for category, message in messages %}
+  <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+    Wikipedia does not have an article with this exact name <a href='https://en.wikipedia.org/wiki/{{message}}' class="alert-link" target="_blank">{{ message }}.</a> Click to visit Wikipedia
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}

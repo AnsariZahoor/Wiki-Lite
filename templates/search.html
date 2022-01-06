@@ -1,0 +1,56 @@
+{% extends 'basic.html' %}
+
+{% block titles %} Wiki Lite - Search {% endblock %}
+
+{% block body %}
+<main class="container">
+
+    <div class="my-3 p-3 bg-body rounded shadow-sm">
+        <h4 class="border-bottom pb-2 mb-0">{{context['title']}}</h4>
+    </div>
+
+    <div class="my-3 p-3 bg-body rounded shadow-sm">
+        <h6 class="border-bottom pb-2 mb-0 text-muted">Wikipedia Summary</h6>
+
+        <div class="d-flex pt-3">
+            <p class="pb-3 mb-0 summary-text  border-bottom">
+                {{context['paragraph']}}
+            </p>
+        </div>
+    </div>
+
+    <div class="my-3 p-3 bg-body rounded shadow-sm">
+        <h6 class="border-bottom pb-2 mb-0 text-muted">Wikipedia Image</h6>
+
+        <div class="d-flex pt-3">
+            <div class="pb-3 mb-0 border-bottom">
+
+                <div class="container overflow-hidden">
+                    <div class="row gy-3">
+                        {% for links in context['image_links'] %}
+                        <div class="col-4">
+                            <img src="{{ links }}" class="img-thumbnail p-0">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="my-3 p-3 bg-body rounded shadow-sm">
+        <h6 class="border-bottom pb-2 mb-0 text-muted">Top 10 Reference links</h6>
+
+        <div class="d-flex pt-3">
+            <p class="pb-3 mb-0 summary-text  border-bottom">
+            <ul class="list-group list-group-flush">
+            {% for text, links in zip(context['references_text'], context['references_links']) %}
+                <li class="list-group-item"><a href="{{ links }}" class="text-decoration-none" target="_blank">{{ text }}</a></li>
+            {% endfor %}
+            </ul>
+            </p>
+        </div>
+    </div>
+
+</main>
+{% endblock %}
