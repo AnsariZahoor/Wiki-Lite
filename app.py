@@ -11,7 +11,6 @@ username = 'Zahoor'
 password = 'aXnTvIYxLAwBAbxq'
 db_name = 'Wikipedia-Scrapper'
 
-collection_name = None
 free_status = True
 
 # initialising the flask app with the name 'app'
@@ -42,7 +41,7 @@ def index():
             mongoClient = MongoDBManagement(username=username, password=password)
             collection_name = search_term.replace(" ","-").lower()
             if mongoClient.isCollectionPresent(collection_name=collection_name, db_name=db_name):
-                return redirect(url_for('search',search_term=collection_name))
+                return redirect(url_for('search',collection_name=collection_name))
             else:
                 try:
                     scrapper_object = WikipediaScrapper(executable_path=ChromeDriverManager().install(),chrome_options=chrome_options)
@@ -52,7 +51,7 @@ def index():
                         return redirect(url_for('index'))
                     else:
                         mongoClient.saveJsonDataIntoCollection(collection_name=collection_name, db_name=db_name, json_data=wikipediaData)
-                        return redirect(url_for('search',search_term=collection_name))
+                        return redirect(url_for('search',collection_name=collection_name))
                 except Exception as e:
                     flash(f'{search_term}', 'danger')
                     return redirect(url_for('index'))
@@ -62,10 +61,9 @@ def index():
 
     return render_template('index.html')
 
-@app.route('/search/<search_term>')
+@app.route('/search/<collection_name>')
 @cross_origin()
-def search(search_term):
-    global collection_name
+def search(collection_name):
     try:
         if collection_name is not None:
             mongoClient = MongoDBManagement(username=username, password=password)
