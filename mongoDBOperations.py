@@ -190,7 +190,6 @@ class MongoDBManagement:
         """
         try:
             collection_check_status = self.isCollectionPresent(collection_name=collection_name, db_name=db_name)
-            print('saveJsonDataIntoCollection', collection_check_status)
             if collection_check_status:
                 self.insertRecord(collection_name=collection_name, db_name=db_name, record=json_data)
                 return "Inserted"

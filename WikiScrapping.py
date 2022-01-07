@@ -1,11 +1,13 @@
+from sumy.summarizers.lex_rank import LexRankSummarizer 
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import pandas as pd
 import re
 
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
+import nltk
+from sumy.nlp.tokenizers import Tokenizer
+from sumy.parsers.plaintext import PlaintextParser
+from sumy.summarizers.lex_rank import LexRankSummarizer 
 
 class WikipediaScrapper:
     def __init__(self, executable_path, chrome_options):
@@ -66,6 +68,24 @@ class WikipediaScrapper:
             return text
         except Exception as e:
             raise Exception(f"(getParagraph) - Not able to get the wikipedia information.\n" + str(e))
+
+
+    def getSummarization(self, text):
+        """
+        This function returns Wikipedia paragraph
+        """
+        try:
+            summarizer = LexRankSummarizer()
+            parser = PlaintextParser.from_string(text, Tokenizer("english"))
+            #Summarize the document with 5 sentences
+            summary = summarizer(parser.document, 5) 
+            article_text = []
+            for sentences in summary:
+                article_text.append(str(sentences))
+            paras = ' '.join(paragraph for paragraph in article_text)
+            return paras
+        except Exception as e:
+            raise Exception(f"(getSummarization) - Not able to generate summary.\n" + str(e))
 
 
     def getImageLink(self, soup):
@@ -148,23 +168,28 @@ class WikipediaScrapper:
         try:
             url = self.getUrl(searchString)
             self.driver.get(url.format(url))
+
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
 
             if self.checkPageExist(soup) is False:
                 return False
             else:
                 title = self.getTitle(soup)
+
                 paragraph = self.getParagraph(soup)
+                summary = self.getSummarization(paragraph)
+
                 image_links = self.getImageLink(soup)
 
                 references_text, references_links = self.getTopReferences(soup)
 
                 dictionary = {
                     "Title": title,
-                    "Information": paragraph,
+                    "Information": summary,
                     "References Text": references_text,
                     "References Link": references_links,
-                    "Image Links": image_links
+                    "Image Links": image_links,
+                    "Wikipedia Link": url.replace(" ","_").lower()
                 }
 
                 return dictionary

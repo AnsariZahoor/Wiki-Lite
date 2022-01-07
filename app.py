@@ -1,4 +1,3 @@
-from logger_class import getLog
 from flask import Flask, render_template, request, url_for, redirect, flash
 from flask_cors import CORS, cross_origin
 from mongoDBOperations import MongoDBManagement
@@ -14,7 +13,7 @@ db_name = 'Wikipedia-Scrapper'
 
 collection_name = None
 free_status = True
-logger = getLog('wikilite.py')
+
 # initialising the flask app with the name 'app'
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -38,54 +37,46 @@ def index():
 
         # obtaining the search string entered in the form
         search_term = request.form['topic']
-        logger.info("Got Search string")
 
         try:
-            logger.info("Connecting with database...")
             mongoClient = MongoDBManagement(username=username, password=password)
             collection_name = search_term.replace(" ","-").lower()
             if mongoClient.isCollectionPresent(collection_name=collection_name, db_name=db_name):
-                logger.info(f"{search_term} - Data is present in database")
-                return redirect(url_for('search'))
+                return redirect(url_for('search',search_term=collection_name))
             else:
-                logger.info(f"{search_term} - Data is not present in database")
-                scrapper_object = WikipediaScrapper(executable_path=ChromeDriverManager().install(),chrome_options=chrome_options)
-                logger.info(f"Search begins for - {search_term}")
-                wikipediaData = scrapper_object.searchWikipedia(search_term)
-                if wikipediaData is False:
-                    logger.info(f"Wikipedia does not have an article - {search_term}")
+                try:
+                    scrapper_object = WikipediaScrapper(executable_path=ChromeDriverManager().install(),chrome_options=chrome_options)
+                    wikipediaData = scrapper_object.searchWikipedia(search_term)
+                    if wikipediaData is False:
+                        flash(f'{search_term}', 'danger')
+                        return redirect(url_for('index'))
+                    else:
+                        mongoClient.saveJsonDataIntoCollection(collection_name=collection_name, db_name=db_name, json_data=wikipediaData)
+                        return redirect(url_for('search',search_term=collection_name))
+                except Exception as e:
                     flash(f'{search_term}', 'danger')
                     return redirect(url_for('index'))
-                else:
-                    mongoClient.saveJsonDataIntoCollection(collection_name=collection_name, db_name=db_name, json_data=wikipediaData)
-                    logger.info("Data saved in database")
-                    return redirect(url_for('search'))
 
         except Exception as e:
-            flash(f'{search_term}', 'danger')
-            print("(app.py) - Something went wrong on scrapping wikipedia article.\n" + str(e))
-            return redirect(url_for('index'))
+            raise Exception("(app.py) - Something went wrong on scrapping wikipedia article.\n" + str(e))
 
     return render_template('index.html')
 
-
-@app.route('/search')
+@app.route('/search/<search_term>')
 @cross_origin()
-def search():
+def search(search_term):
     global collection_name
     try:
         if collection_name is not None:
-            logger.info("Connecting with database to retrieve data...")
             mongoClient = MongoDBManagement(username=username, password=password)
-            logger.info("Retrieving wikipedia data...")
             response = mongoClient.findAllRecords(db_name=db_name, collection_name=collection_name)
-            logger.info("Retrieved wikipedia data successfully")
             context = {
                 "title": response.get('Title'),
                 "paragraph": response.get('Information'),
                 "references_text": response.get('References Text'),
                 "references_links": response.get('References Link'),
-                "image_links": response.get('Image Links')
+                "image_links": response.get('Image Links'),
+                "wiki_link": response.get('Wikipedia Link'),
             }
             return render_template('search.html', context=context, zip=zip)
         else:
