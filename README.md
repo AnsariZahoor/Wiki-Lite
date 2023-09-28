@@ -1,8 +1,23 @@
 # Wiki-Lite
 
-Get summary of your Wikipedia Article
+### Wiki Lite App, built using Flask
+Wiki Lite: Get summary of your Wikipedia Article
 
-Check it out: https://wiki-lite-project.herokuapp.com/
+Application Workflow:
+1. Obtain the user's chosen topic.
+2. Search and scrape HTML content from Wikipedia.
+3. Extract text, images, and reference links.
+4. Utilize the LexRankSummarizer Python library to create concise summaries.
+5. Store this data in a MongoDB database for future reference.
+6. Present the content to the user.
+
+Skills &nbsp;
+![Python](https://img.shields.io/badge/-Python-333333?style=flat&logo=python)
+![Selenium](https://img.shields.io/badge/-Selenium-333333?style=flat&logo=Selenium)
+![Flask](https://img.shields.io/badge/-Flask-333333?style=flat&logo=flask)
+![MongoDB](https://img.shields.io/badge/-MongoDB-333333?style=flat&logo=mongodb)
+
+
 
 ![image](https://user-images.githubusercontent.com/66164268/149118231-f428502c-2fb5-4997-b1d0-7766fd10cbcd.png)
 
